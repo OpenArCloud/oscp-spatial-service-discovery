@@ -51,9 +51,6 @@ npm start
 http://localhost:3000/swagger/
 ```
 
-![Swagger image](images/swagger.png?raw=true)
-
-
 
 ## Spatial Service Record
 
@@ -74,7 +71,7 @@ Ssr {
   id: string;
   type: string;
   services: string[];
-  url: URL[];
+  urls: URL[];
   geometry: Geometry;
   altitude?: number;
   provider: string;
