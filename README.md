@@ -26,9 +26,9 @@ Create .env file with required params ex.
 
 ```
 KAPPA_CORE_DIR="data"
-AUTH0_ISSUER=https://dev-r3x4eu9z.us.auth0.com/
-AUTH0_AUDIENCE=https://ssd.oscp.cloudpose.io
-COUNTRY="IT"
+AUTH0_ISSUER=https://ssd-oscp.us.auth0.com/
+AUTH0_AUDIENCE=https://ssd.oscp.clouspose.io
+COUNTRIES="IT,FI,US,MS,CZ,UK"
 PORT=3000
 ```
 
