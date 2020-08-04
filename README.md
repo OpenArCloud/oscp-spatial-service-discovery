@@ -28,7 +28,7 @@ Create .env file with required params ex.
 KAPPA_CORE_DIR="data"
 AUTH0_ISSUER=https://ssd-oscp.us.auth0.com/
 AUTH0_AUDIENCE=https://ssd.oscp.clouspose.io
-COUNTRIES="IT,FI,US,MS,CZ,UK"
+COUNTRIES="IT,FI,US"
 PORT=3000
 ```
 
