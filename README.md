@@ -54,6 +54,13 @@ http://localhost:3000/swagger/
 ![Swagger image](images/swagger.png?raw=true)
 
 
+## Search Logic
+
+The query API expects a client to provide a hexagonal coverage area by using an [H3 index](https://eng.uber.com/h3/) at precision level 8. This avoids exposing the client's specific location. The service performs a wider scale query at a configurable radius (default: 5km) to the p2p OpenStreetMap backend and returns any coverage polygons that intersect with the H3 hexagon.
+
+![Search image](images/search.png?raw=true)
+
+
 ## Spatial Service Record
 
 Base version of a Spatial Service Record (expected to evolve):
