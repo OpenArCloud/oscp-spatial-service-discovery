@@ -41,7 +41,7 @@ COUNTRIES.forEach((country) => {
 });
 
 export const find = async (country: string, id: string): Promise<Ssr> => {
-  if (!COUNTRIES.includes(country.toUpperCase()))
+  if (!COUNTRIES.includes(country))
     throw new Error("Invalid country");
 
   const osmGet = new Promise<Element[]>((resolve, reject) => {
@@ -77,7 +77,7 @@ export const remove = async (
   id: string,
   provider: string
 ): Promise<void> => {
-  if (!COUNTRIES.includes(country.toUpperCase()))
+  if (!COUNTRIES.includes(country))
     throw new Error("Invalid country");
 
   const osmGet = new Promise<Element[]>((resolve, reject) => {
@@ -113,7 +113,7 @@ export const findHex = async (
   country: string,
   h3Index: string
 ): Promise<Ssr[]> => {
-  if (!COUNTRIES.includes(country.toUpperCase()))
+  if (!COUNTRIES.includes(country))
     throw new Error("Invalid country");
 
   const hexBoundary = h3.h3ToGeoBoundary(h3Index, true);
@@ -165,7 +165,7 @@ export const create = async (
   ssr: SsrDto,
   provider: string
 ): Promise<string> => {
-  if (!COUNTRIES.includes(country.toUpperCase()))
+  if (!COUNTRIES.includes(country))
     throw new Error("Invalid country");
 
   try {
@@ -245,7 +245,7 @@ export const update = async (
   ssr: SsrDto,
   provider: string
 ): Promise<void> => {
-  if (!COUNTRIES.includes(country.toUpperCase()))
+  if (!COUNTRIES.includes(country))
     throw new Error("Invalid country");
 
   try {
