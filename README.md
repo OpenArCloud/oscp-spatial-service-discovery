@@ -97,6 +97,10 @@ Documents (OSM elements, observations, etc) have a common format within [kappa-o
   }
 ```
 
+## Mapping to OSM Data Model
+
+GeoJSON polygons are mapped to OSM closed *ways* which reference an ordered set of OSM *nodes*. In addition, the GeoJSON polygons are stored as tags within the OSM *ways* to avoid the need to iterate through all nodes on reads.
+
 
 ## Release 0 Status
 
