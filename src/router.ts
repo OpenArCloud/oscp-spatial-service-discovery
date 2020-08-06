@@ -17,7 +17,7 @@ class Router {
       "/:country/ssrs/:id",
       async (req: express.Request, res: express.Response) => {
         try {
-          const country: string = String(req.params.country);
+          const country: string = String(req.params.country).toUpperCase();
           const id: string = String(req.params.id);
           const ssr: Ssr = await Service.find(country, id);
           res.status(200).send(ssr);
@@ -37,7 +37,7 @@ class Router {
             req["user"][AUTH0_AUDIENCE + "/provider"]
           );
 
-          const country: string = String(req.params.country);
+          const country: string = String(req.params.country).toUpperCase();
           const id: string = String(req.params.id);
           await Service.remove(country, id, provider);
           res.sendStatus(200);
@@ -51,7 +51,7 @@ class Router {
       "/:country/ssrs",
       async (req: express.Request, res: express.Response) => {
         try {
-          const country: string = String(req.params.country);
+          const country: string = String(req.params.country).toUpperCase();
           const h3Index: string = String(req.query.h3Index);
           const ssrs: Ssr[] = await Service.findHex(country, h3Index);
           res.status(200).send(ssrs);
@@ -71,7 +71,7 @@ class Router {
             req["user"][AUTH0_AUDIENCE + "/provider"]
           );
 
-          const country: string = String(req.params.country);
+          const country: string = String(req.params.country).toUpperCase();
           let ssr = new SsrDto();
           Object.assign(ssr, req.body);
           const id: string = await Service.create(country, ssr, provider);
@@ -92,7 +92,7 @@ class Router {
             req["user"][AUTH0_AUDIENCE + "/provider"]
           );
 
-          const country: string = String(req.params.country);
+          const country: string = String(req.params.country).toUpperCase();
           const id: string = String(req.params.id);
           let ssr = new SsrDto();
           Object.assign(ssr, req.body);
