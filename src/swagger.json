@@ -1,0 +1,320 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "oscp-spatial-service-discovery",
+    "description": "OSCP Spatial Service Discovery Service (Open AR Cloud)",
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+
+  "servers": [
+    {
+      "url": "/",
+      "description": "Local Dev"
+    }
+  ],
+
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "paths": {
+    "/{country}/ssrs": {
+      "get": {
+        "summary": "Get SSRs covering h3Index",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "country",
+            "required": true,
+            "description": "SSR country"
+          },
+          {
+            "in": "query",
+            "name": "h3Index",
+            "required": true,
+            "description": "SSR h3 Index"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Ssr"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Failed"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new SSR",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "country",
+            "required": true,
+            "description": "SSR country"
+          }
+        ],
+        "requestBody": {
+          "description": "SSR Object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/definitions/SsrDto"
+              }
+            }
+          }
+        },
+        "produces": ["text/html"],
+        "responses": {
+          "201": {
+            "description": "OK",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Failed"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": ["create:ssrs"]
+          }
+        ]
+      }
+    },
+    "/{country}/ssrs/{id}": {
+      "get": {
+        "summary": "Get SSR with given ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "country",
+            "required": true,
+            "description": "SSR country"
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "SSR id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/definitions/Ssr"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Failed"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete SSR with given ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "country",
+            "required": true,
+            "description": "SSR country"
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "SSR id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Failed"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": ["delete:ssrs"]
+          }
+        ]
+      },
+      "put": {
+        "summary": "Update SSR with given ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "country",
+            "required": true,
+            "description": "SSR country"
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "SSR id"
+          }
+        ],
+        "requestBody": {
+          "description": "SSR Object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/definitions/SsrDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Failed"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": ["update:ssrs"]
+          }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "Ssr": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "services": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "urls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "geometry": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "coordinates": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "lat": {
+                    "type": "number"
+                  },
+                  "lon": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "altitude": {
+          "type": "number"
+        },
+        "provider": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
+        }
+      }
+    },
+    "SsrDto": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "services": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "urls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "geometry": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "coordinates": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "lat": {
+                    "type": "number"
+                  },
+                  "lon": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "altitude": {
+          "type": "number"
+        }
+      }
+    }
+  }
+}
