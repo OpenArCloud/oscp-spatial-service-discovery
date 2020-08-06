@@ -4,7 +4,7 @@ OSCP Spatial Service Discovery
 
 ## Purpose
 
-Baseline implementation of the OSCP Spatial Service Discovery APIs. These APIs allow an OSCP client to discover nearby spatial service providers (ex. GeoPose provider, spatial content provider). Spatial service records are synchronized in real-time across multiple top-level (ex. country) providers in a peer-to-peer manner through the [kappa-osm](https://github.com/digidem/kappa-osm) database for decentralized OpenStreetMap. Discovery is managed via [hyperswarm](https://github.com/hyperswarm/hyperswarm).
+Baseline implementation of the OSCP Spatial Service Discovery APIs. These APIs allow an OSCP client to discover nearby spatial service providers (ex. GeoPose provider, spatial content provider, reality modeling provider). Spatial service records are synchronized in real-time across multiple top-level (ex. country) providers in a peer-to-peer manner through the [kappa-osm](https://github.com/digidem/kappa-osm) database for decentralized OpenStreetMap. Discovery is managed via [hyperswarm](https://github.com/hyperswarm/hyperswarm).
 
 The P2P stack is based on components from the [Hypercore protocol](https://hypercore-protocol.org/). [kappa-osm](https://github.com/digidem/kappa-osm) builds on [kappa-core](https://github.com/kappa-db/kappa-core), which combines multiple append-only logs, [hypercores](https://github.com/mafintosh/hypercore), via [multifeed](https://github.com/kappa-db/multifeed), and adds materialized views. Spatial queries rely on a Bkd tree materialized view, [unordered-materialized-bkd](https://github.com/digidem/unordered-materialized-bkd).
 
@@ -56,7 +56,7 @@ http://localhost:3000/swagger/
 
 ## Search Logic
 
-The query API expects a client to provide a hexagonal coverage area by using an [H3 index](https://eng.uber.com/h3/) at precision level 8. This avoids exposing the client's specific location. The service then performs a wider scale query at a configurable radius (default: 5km) to the p2p OpenStreetMap backend and returns any coverage polygons that intersect with the client provided H3 hexagon.
+The query API expects a client to provide a hexagonal coverage area by using an [H3 index](https://eng.uber.com/h3/) ex. precision level 8. This avoids exposing the client's specific location. The service then performs a wider scale query at a configurable radius (default: 5km) to the p2p OpenStreetMap backend and returns any coverage polygons that intersect with the client provided H3 hexagon.
 
 ![Search image](images/search.png?raw=true)
 
@@ -99,7 +99,7 @@ Documents (OSM elements, observations, etc) have a common format within [kappa-o
 
 ## Mapping to OSM Data Model
 
-GeoJSON polygons are mapped to OSM closed *ways* which reference an ordered set of OSM *nodes*. In addition, the GeoJSON polygons are stored as tags within the OSM *ways* to avoid the need to iterate through all nodes on reads.
+GeoJSON polygons are mapped to OSM closed *ways* which reference an ordered set of OSM *nodes*. In addition, the GeoJSON polygons are stored as tags within the OSM *ways* to avoid the need to iterate through all nodes on reads. An OSM bounding box query returns a *way* if at least one of the corresponding *nodes* are covered.
 
 
 ## Release 0 Status
