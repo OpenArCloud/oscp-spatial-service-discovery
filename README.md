@@ -4,11 +4,11 @@ OSCP Spatial Service Discovery
 
 ## Purpose
 
-Baseline implementation of the OSCP Spatial Service Discovery APIs built on the [kappa-osm](https://github.com/digidem/kappa-osm) database for decentralized OpenStreetMap and synchronizing in real-time via [hyperswarm](https://github.com/hyperswarm/hyperswarm).
+Baseline implementation of the OSCP Spatial Service Discovery APIs. These APIs allow an OSCP client to discover nearby spatial service providers (ex. GeoPose provider, spatial content provider). Spatial service records are synchronized in real-time across multiple top-level (ex. country) providers in a peer-to-peer manner through the [kappa-osm](https://github.com/digidem/kappa-osm) database for decentralized OpenStreetMap. Discovery is managed via [hyperswarm](https://github.com/hyperswarm/hyperswarm).
 
-The P2P stack is based on components from the [Hypercore protocol](https://hypercore-protocol.org/). The [kappa-osm](https://github.com/digidem/kappa-osm) database builds on [kappa-core](https://github.com/kappa-db/kappa-core), which combines multi-writer append-only logs, [hypercores](https://github.com/mafintosh/hypercore) via [multifeed](https://github.com/kappa-db/multifeed), with materialized views. Spatial queries rely on a Bkd tree materialized view, [unordered-materialized-bkd](https://github.com/digidem/unordered-materialized-bkd).
+The P2P stack is based on components from the [Hypercore protocol](https://hypercore-protocol.org/). [kappa-osm](https://github.com/digidem/kappa-osm) builds on [kappa-core](https://github.com/kappa-db/kappa-core), which combines multi-writer append-only logs, [hypercores](https://github.com/mafintosh/hypercore) via [multifeed](https://github.com/kappa-db/multifeed), with materialized views. Spatial queries rely on a Bkd tree materialized view, [unordered-materialized-bkd](https://github.com/digidem/unordered-materialized-bkd).
 
-Authentication/authorization is based on JSON Web Tokens (JWTs) via [OpenID Connect](https://openid.net/connect/). A sample integration with [Auth0](https://auth0.com/) is provided.
+Authentication/authorization is based on JSON Web Tokens (JWTs) via the [OpenID Connect](https://openid.net/connect/) standard. A sample integration with [Auth0](https://auth0.com/) is provided.
 
 
 ## Usage
