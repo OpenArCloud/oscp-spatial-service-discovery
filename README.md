@@ -51,28 +51,20 @@ npm start
 http://localhost:3000/swagger/
 ```
 
+![Swagger image](images/swagger.png?raw=true)
+
 
 ## Spatial Service Record
 
 Base version of a Spatial Service Record (expected to evolve):
 
 ```js
-Point {
-  lat: number;
-  lon: number;
-}
-
-Geometry {
-  type: string;
-  coordinates: Point[];
-}
-
 Ssr {
   id: string;
   type: string;
   services: string[];
   urls: URL[];
-  geometry: Geometry;
+  geometry: GeoJSON Polygon;
   altitude?: number;
   provider: string;
   timestamp: Date;
@@ -101,11 +93,11 @@ Documents (OSM elements, observations, etc) have a common format within [kappa-o
 
 ## Release 0 Status
 
-- [ ] Read specific spatial service record via REST API 
-- [ ] REST API authentication
-- [ ] Read (bbox search) spatial service records via REST API
-- [ ] Delete spatial service record via REST API (single)
-- [ ] Create spatial service record via REST API (single)
+- [x] Read specific spatial service record via REST API 
+- [x] REST API authentication
+- [x] Read (hexagon search) spatial service records via REST API
+- [x] Delete spatial service record via REST API (single)
+- [x] Create spatial service record via REST API (single)
 - [x] Define base spatial service record (JSON)
-- [ ] REST API authentication multi-tenancy
-- [ ] Update spatial service record via REST API (single)
+- [x] REST API authentication multi-tenancy
+- [x] Update spatial service record via REST API (single)
