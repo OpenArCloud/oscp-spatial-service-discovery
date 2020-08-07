@@ -49,7 +49,7 @@ class Router {
       async (req: express.Request, res: express.Response) => {
         try {
           const country: string = req.params.country.toUpperCase();
-          const h3Index: string = String(req.query.h3Index);
+          const h3Index: string = req.query.h3Index as string;
           const ssrs: Ssr[] = await Service.findHex(country, h3Index);
           res.status(200).send(ssrs);
         } catch (e) {

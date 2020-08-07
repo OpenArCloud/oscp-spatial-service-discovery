@@ -114,6 +114,7 @@ export const findHex = async (
   h3Index: string
 ): Promise<Ssr[]> => {
   if (!COUNTRIES.includes(country)) throw new Error("Invalid country");
+  if (!h3Index) throw new Error("Invalid h3Index");
 
   const hexBoundary = h3.h3ToGeoBoundary(h3Index, true);
   const hexPoly = turf.polygon([hexBoundary]);
