@@ -26,6 +26,7 @@ Create .env file with required params ex.
 
 ```
 KAPPA_CORE_DIR="data"
+SWARM_TOPIC_PREFIX="oscpdev_ssd"
 AUTH0_ISSUER=https://ssd-oscp.us.auth0.com/
 AUTH0_AUDIENCE=https://ssd.oscp.clouspose.io
 COUNTRIES="IT,FI,US"
@@ -66,11 +67,16 @@ The query API expects a client to provide a hexagonal coverage area by using an 
 Base version of a Spatial Service Record (expected to evolve):
 
 ```js
+Service {
+  type: string;
+  url: URL;
+  capabilities?: string[];
+}
+
 Ssr {
   id: string;
   type: string;
-  services: string[];
-  urls: URL[];
+  services: Service[];
   geometry: GeoJSON Polygon;
   altitude?: number;
   provider: string;

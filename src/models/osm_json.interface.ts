@@ -1,8 +1,8 @@
 import turf from "@turf/turf";
+import { Service } from "./ssr.interface";
 
 export interface Tags {
-  services: string[];
-  urls: URL[];
+  services: Service[];
   geometry: turf.Polygon;
   altitude?: number;
   provider: string;
