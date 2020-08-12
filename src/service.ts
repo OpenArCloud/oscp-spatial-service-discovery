@@ -15,6 +15,7 @@ import * as turf from "@turf/turf";
 dotenv.config();
 
 const KAPPA_CORE_DIR: string = process.env.KAPPA_CORE_DIR as string;
+const SWARM_TOPIC_PREFIX: string = process.env.SWARM_TOPIC_PREFIX as string;
 let COUNTRIES: string[] = process.env.COUNTRIES.split(",");
 COUNTRIES = COUNTRIES.map(function (x) {
   return x.toUpperCase();
@@ -28,7 +29,7 @@ let kappaCores: IHash = {};
 
 COUNTRIES.forEach((country) => {
   kappaCores[country] = Osm({
-    core: kappa(KAPPA_CORE_DIR + "/oscp_ssd_" + country, {
+    core: kappa(KAPPA_CORE_DIR + "/" + SWARM_TOPIC_PREFIX + "_" + country, {
       valueEncoding: "json",
     }),
     index: memdb(),
@@ -37,7 +38,10 @@ COUNTRIES.forEach((country) => {
     },
   });
 
-  const swarm = Swarm.swarm(kappaCores[country], "oscp_ssd_" + country);
+  const swarm = Swarm.swarm(
+    kappaCores[country],
+    SWARM_TOPIC_PREFIX + "_" + country
+  );
 });
 
 export const find = async (country: string, id: string): Promise<Ssr> => {
@@ -60,7 +64,6 @@ export const find = async (country: string, id: string): Promise<Ssr> => {
       id: p.id,
       type: "ssr",
       services: p.tags.services,
-      urls: p.tags.urls,
       geometry: p.tags.geometry,
       altitude: p.tags.altitude,
       provider: p.tags.provider,
@@ -148,7 +151,6 @@ export const findHex = async (
       id: p.id,
       type: "ssr",
       services: p.tags.services,
-      urls: p.tags.urls,
       geometry: p.tags.geometry,
       altitude: p.tags.altitude,
       provider: p.tags.provider,
@@ -182,8 +184,6 @@ export const create = async (
     )
   )
     throw new Error("Invalid polygon");
-  if (ssr.services.length !== ssr.urls.length)
-    throw new Error("Service/URL count mismatch");
 
   let nodeIds: string[] = [];
 
@@ -217,7 +217,6 @@ export const create = async (
     refs: nodeIds,
     tags: {
       services: ssr.services,
-      urls: ssr.urls,
       geometry: ssr.geometry,
       provider: provider,
       altitude: ssr.altitude,
@@ -277,8 +276,6 @@ export const update = async (
     )
   )
     throw new Error("Invalid polygon");
-  if (ssr.services.length !== ssr.urls.length)
-    throw new Error("Service/URL count mismatch");
 
   let nodeIds: string[] = [];
 
@@ -312,7 +309,6 @@ export const update = async (
     refs: nodeIds,
     tags: {
       services: ssr.services,
-      urls: ssr.urls,
       geometry: ssr.geometry,
       provider: provider,
       altitude: ssr.altitude,

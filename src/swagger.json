@@ -217,6 +217,55 @@
     }
   },
   "definitions": {
+    "Geometry": {
+      "type": "object",
+      "description": "GeoJSon geometry",
+      "discriminator": "type",
+      "required": ["type"],
+      "externalDocs": {
+        "url": "http://geojson.org/geojson-spec.html#geometry-objects"
+      },
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["Polygon"],
+          "description": "the geometry type"
+        }
+      }
+    },
+    "Point2D": {
+      "type": "array",
+      "maxItems": 2,
+      "minItems": 2,
+      "items": {
+        "type": "number"
+      }
+    },
+    "Polygon": {
+      "type": "object",
+      "description": "GeoJSon geometry",
+      "externalDocs": {
+        "url": "http://geojson.org/geojson-spec.html#id4"
+      },
+      "allOf": [
+        {
+          "$ref": "#/definitions/Geometry"
+        },
+        {
+          "properties": {
+            "coordinates": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/Point2D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
     "Ssr": {
       "type": "object",
       "properties": {
@@ -229,36 +278,25 @@
         "services": {
           "type": "array",
           "items": {
-            "type": "string"
-          }
-        },
-        "urls": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "geometry": {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string"
-            },
-            "coordinates": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "lat": {
-                    "type": "number"
-                  },
-                  "lon": {
-                    "type": "number"
-                  }
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "capabilities": {
+                "type": "array",
+                "items": {
+                  "type": "string"
                 }
               }
             }
           }
+        },
+        "geometry": {
+          "$ref": "#/definitions/Polygon"
         },
         "altitude": {
           "type": "number"
@@ -280,36 +318,25 @@
         "services": {
           "type": "array",
           "items": {
-            "type": "string"
-          }
-        },
-        "urls": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "geometry": {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string"
-            },
-            "coordinates": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "lat": {
-                    "type": "number"
-                  },
-                  "lon": {
-                    "type": "number"
-                  }
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              },
+              "capabilities": {
+                "type": "array",
+                "items": {
+                  "type": "string"
                 }
               }
             }
           }
+        },
+        "geometry": {
+          "$ref": "#/definitions/Polygon"
         },
         "altitude": {
           "type": "number"
