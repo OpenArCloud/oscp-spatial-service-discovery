@@ -62,9 +62,18 @@ The query API expects a client to provide a hexagonal coverage area by using an 
 ![Search image](images/search.png?raw=true)
 
 
-## Spatial Service Record (SSR)
+## API Versioning
 
 Current version: 1.0
+
+The API version can be specified by the HTTP Accept header using a vendor-specific media type as per [RFC4288](https://tools.ietf.org/html/rfc4288):
+
+```
+application/vnd.oscp+json; version=1.0;
+```
+
+
+## Spatial Service Record (SSR)
 
 Base version of a Spatial Service Record (expected to evolve):
 
