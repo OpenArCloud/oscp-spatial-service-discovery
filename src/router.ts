@@ -3,6 +3,7 @@ import * as Service from "./service";
 import { Ssr } from "./models/ssr.interface";
 import { SsrDto } from "./models/ssr.dto";
 import { checkJwt } from "./middleware/authz.middleware";
+import { Global } from "./global";
 
 const jwtAuthz = require("express-jwt-authz");
 
@@ -19,7 +20,7 @@ class Router {
           const country: string = req.params.country.toUpperCase();
           const id: string = req.params.id;
           const ssr: Ssr = await Service.find(country, id);
-          res.status(200).send(ssr);
+          res.status(200).type('application/vnd.oscp+json; version=' + Global.ssdVersion).send(ssr);
         } catch (e) {
           res.status(404).send(e.message);
         }
@@ -50,7 +51,7 @@ class Router {
           const country: string = req.params.country.toUpperCase();
           const h3Index: string = req.query.h3Index as string;
           const ssrs: Ssr[] = await Service.findHex(country, h3Index);
-          res.status(200).send(ssrs);
+          res.status(200).type('application/vnd.oscp+json; version=' + Global.ssdVersion).send(ssrs);
         } catch (e) {
           res.status(404).send(e.message);
         }

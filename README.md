@@ -62,22 +62,27 @@ The query API expects a client to provide a hexagonal coverage area by using an 
 ![Search image](images/search.png?raw=true)
 
 
-## Spatial Service Record
+## Spatial Service Record (SSR)
+
+Current version: 1.0
 
 Base version of a Spatial Service Record (expected to evolve):
 
 ```js
-Service {
+export interface Service {
+  id: string;
   type: string;
+  title?: string;
+  description?: string;
   url: URL;
   capabilities?: string[];
 }
 
-Ssr {
+export interface Ssr {
   id: string;
   type: string;
   services: Service[];
-  geometry: GeoJSON Polygon;
+  geometry: turf.Polygon;
   altitude?: number;
   provider: string;
   timestamp: Date;
@@ -107,14 +112,3 @@ Documents (OSM elements, observations, etc) have a common format within [kappa-o
 
 GeoJSON polygons are mapped to OSM closed *ways* which reference an ordered set of OSM *nodes*. In addition, the GeoJSON polygons are stored as tags within the OSM *ways* to avoid the need to iterate through all nodes on reads. An OSM bounding box query returns a *way* if at least one of the corresponding *nodes* are covered.
 
-
-## Release 0 Status
-
-- [x] Read specific spatial service record via REST API 
-- [x] REST API authentication
-- [x] Read (hexagon search) spatial service records via REST API
-- [x] Delete spatial service record via REST API (single)
-- [x] Create spatial service record via REST API (single)
-- [x] Define base spatial service record (JSON)
-- [x] REST API authentication multi-tenancy
-- [x] Update spatial service record via REST API (single)

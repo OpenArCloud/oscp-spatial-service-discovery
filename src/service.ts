@@ -11,6 +11,7 @@ import dotenv from "dotenv";
 import * as Swarm from "./swarm";
 import * as h3 from "h3-js";
 import * as turf from "@turf/turf";
+import { Global } from "./global";
 
 dotenv.config();
 
@@ -220,6 +221,7 @@ export const create = async (
       geometry: ssr.geometry,
       provider: provider,
       altitude: ssr.altitude,
+      version: Global.ssdVersion
     },
   };
 
@@ -312,6 +314,7 @@ export const update = async (
       geometry: ssr.geometry,
       provider: provider,
       altitude: ssr.altitude,
+      version: Global.ssdVersion
     },
   };
 
