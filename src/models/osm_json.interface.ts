@@ -6,6 +6,7 @@ export interface Tags {
   geometry: turf.Polygon;
   altitude?: number;
   provider: string;
+  version: string;
 }
 
 export interface Element {

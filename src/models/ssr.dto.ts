@@ -14,7 +14,18 @@ import turf from "@turf/turf";
 
 export class ServiceDto {
   @IsString()
+  id: string;
+
+  @IsString()
   type: string;
+
+  @IsString()
+  @IsOptional()
+  title?: string;
+
+  @IsString()
+  @IsOptional()
+  description?: string;
 
   @IsUrl()
   url: URL;
