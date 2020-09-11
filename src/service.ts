@@ -221,7 +221,7 @@ export const create = async (
       geometry: ssr.geometry,
       provider: provider,
       altitude: ssr.altitude,
-      version: Global.ssdVersion
+      version: Global.ssdVersion,
     },
   };
 
@@ -314,7 +314,7 @@ export const update = async (
       geometry: ssr.geometry,
       provider: provider,
       altitude: ssr.altitude,
-      version: Global.ssdVersion
+      version: Global.ssdVersion,
     },
   };
 
