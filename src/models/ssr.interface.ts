@@ -4,7 +4,7 @@ export interface Service {
   id: string;
   type: string;
   title?: string;
-  description?: string;
+  description?: string;
   url: URL;
   capabilities?: string[];
 }

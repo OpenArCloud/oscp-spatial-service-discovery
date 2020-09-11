@@ -1,3 +1,5 @@
+import { Type } from "class-transformer";
+
 import {
   IsLatitude,
   IsLongitude,
@@ -25,12 +27,13 @@ export class ServiceDto {
 
   @IsString()
   @IsOptional()
-  description?: string;
+  description?: string;
 
   @IsUrl()
   url: URL;
 
   @IsString({ each: true })
+  @IsOptional()
   capabilities?: string[];
 }
 
@@ -39,7 +42,8 @@ export class SsrDto {
   @Equals("ssr")
   type: string;
 
-  @ValidateNested()
+  @ValidateNested({ each: true })
+  @Type(() => ServiceDto)
   services: ServiceDto[];
 
   geometry: turf.Polygon;

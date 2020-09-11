@@ -1,3 +1,3 @@
 export namespace Global {
-    export const ssdVersion: string = '1.0';
+  export const ssdVersion: string = "1.0";
 }
