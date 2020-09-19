@@ -163,6 +163,46 @@ export const findHex = async (
   return ssrs;
 };
 
+export const findAllProvider = async (
+  country: string,
+  provider: string
+): Promise<Ssr[]> => {
+
+  if (!COUNTRIES.includes(country)) throw new Error("Invalid country");
+  if (!provider) throw new Error("Invalid provider");
+
+  const osmQuery = new Promise<Element[]>((resolve, reject) => {
+    kappaCores[country].query([-180, -90, 180, 90], function (
+      err,
+      nodes
+    ) {
+      if (err) reject(err);
+      else resolve(nodes);
+    });
+  });
+
+  const elements: Element[] = await osmQuery;
+
+  const ways = elements.filter((element) => element.type === "way");
+
+  const waysAllProvider = ways.filter((element) => element.tags.provider === provider);
+
+  const mapResponse = (response: Element[]) =>
+    response.map((p) => ({
+      id: p.id,
+      type: "ssr",
+      services: p.tags.services,
+      geometry: p.tags.geometry,
+      altitude: p.tags.altitude,
+      provider: p.tags.provider,
+      timestamp: p.timestamp,
+    }));
+
+  const ssrs: Ssr[] = mapResponse(waysAllProvider);
+
+  return ssrs;
+};
+
 export const create = async (
   country: string,
   ssr: SsrDto,

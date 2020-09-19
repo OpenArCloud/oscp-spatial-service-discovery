@@ -15,6 +15,25 @@ class Router {
     const router = express.Router();
 
     router.get(
+      "/:country/provider/ssrs",
+      checkJwt,
+      jwtAuthz(["read:ssrs"]),
+      async (req: express.Request, res: express.Response) => {
+        try {
+          const provider: string = req["user"][AUTH0_AUDIENCE + "/provider"];
+          const country: string = req.params.country.toUpperCase();
+          const ssrs: Ssr[] = await Service.findAllProvider(country, provider);
+          res
+            .status(200)
+            .type("application/vnd.oscp+json; version=" + Global.ssdVersion)
+            .send(ssrs);
+        } catch (e) {
+          res.status(404).send(e.message);
+        }
+      }
+    );
+
+    router.get(
       "/:country/ssrs/:id",
       async (req: express.Request, res: express.Response) => {
         try {
