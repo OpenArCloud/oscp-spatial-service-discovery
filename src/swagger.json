@@ -214,6 +214,42 @@
           }
         ]
       }
+    },
+    "/{country}/provider/ssrs": {
+      "get": {
+        "summary": "Get all own SSRs for provider",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "country",
+            "required": true,
+            "description": "SSR country"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Ssr"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Failed"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": ["read:ssrs"]
+          }
+        ]
+      }
     }
   },
   "definitions": {
