@@ -121,3 +121,8 @@ Documents (OSM elements, observations, etc) have a common format within [kappa-o
 
 GeoJSON polygons are mapped to OSM closed *ways* which reference an ordered set of OSM *nodes*. In addition, the GeoJSON polygons are stored as tags within the OSM *ways* to avoid the need to iterate through all nodes on reads. An OSM bounding box query returns a *way* if at least one of the corresponding *nodes* are covered.
 
+
+## Configuring a Reference Auth Service
+
+To configure Auth0 as a reference auth service please see [Auth0 for SSD](auth0_ssd.md).
+
