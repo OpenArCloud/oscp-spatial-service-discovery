@@ -89,7 +89,7 @@ export interface Service {
 
 export interface Ssr {
   id: string; //platform generated SSR ID
-  type: string; //record type, SSR is currently the only valid type
+  type: string; //record type, "ssr" is currently the only valid type
   services: Service[];
   geometry: turf.Polygon; //GeoJSON polygon
   altitude?: number;
