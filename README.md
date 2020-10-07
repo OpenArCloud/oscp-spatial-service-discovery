@@ -79,22 +79,22 @@ Base version of a Spatial Service Record (expected to evolve):
 
 ```js
 export interface Service {
-  id: string;
-  type: string;
+  id: string; //provider supplied reference ID
+  type: string; //type of spatial services provider ex. geopose, spatial-content
   title?: string;
   description?: string;
   url: URL;
-  capabilities?: string[];
+  capabilities?: string[]; //capabilities, includes supported topics for SCD
 }
 
 export interface Ssr {
-  id: string;
-  type: string;
+  id: string; //platform generated SSR ID
+  type: string; //record type, SSR is currently the only valid type
   services: Service[];
-  geometry: turf.Polygon;
+  geometry: turf.Polygon; //GeoJSON polygon
   altitude?: number;
-  provider: string;
-  timestamp: Date;
+  provider: string; //spatial services provider, populated by platform based on auth
+  timestamp: Date; //platform generated timestamp
 }
 ```
 
