@@ -1,6 +1,8 @@
 import { Type } from "class-transformer";
 
 import {
+  ArrayNotEmpty,
+  IsDefined,
   IsLatitude,
   IsLongitude,
   IsUrl,
@@ -43,9 +45,12 @@ export class SsrDto {
   type: string;
 
   @ValidateNested({ each: true })
+  @IsDefined()
+  @ArrayNotEmpty()
   @Type(() => ServiceDto)
   services: ServiceDto[];
 
+  @IsDefined()
   geometry: turf.Polygon;
 
   @IsNumber()
