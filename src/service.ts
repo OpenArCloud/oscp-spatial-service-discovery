@@ -167,15 +167,11 @@ export const findAllProvider = async (
   country: string,
   provider: string
 ): Promise<Ssr[]> => {
-
   if (!COUNTRIES.includes(country)) throw new Error("Invalid country");
   if (!provider) throw new Error("Invalid provider");
 
   const osmQuery = new Promise<Element[]>((resolve, reject) => {
-    kappaCores[country].query([-180, -90, 180, 90], function (
-      err,
-      nodes
-    ) {
+    kappaCores[country].query([-180, -90, 180, 90], function (err, nodes) {
       if (err) reject(err);
       else resolve(nodes);
     });
@@ -185,7 +181,9 @@ export const findAllProvider = async (
 
   const ways = elements.filter((element) => element.type === "way");
 
-  const waysAllProvider = ways.filter((element) => element.tags.provider === provider);
+  const waysAllProvider = ways.filter(
+    (element) => element.tags.provider === provider
+  );
 
   const mapResponse = (response: Element[]) =>
     response.map((p) => ({
@@ -225,6 +223,36 @@ export const create = async (
     )
   )
     throw new Error("Invalid polygon");
+
+  const newPoly = turf.polygon(ssr.geometry.coordinates);
+  const center = turf.centerOfMass(newPoly);
+  const radius = 10;
+  const options = { steps: 6 };
+  const circle = turf.circle(center, radius, options);
+  const bbox = turf.bbox(circle);
+
+  const osmQuery = new Promise<Element[]>((resolve, reject) => {
+    kappaCores[country].query([bbox[0], bbox[1], bbox[2], bbox[3]], function (
+      err,
+      nodes
+    ) {
+      if (err) reject(err);
+      else resolve(nodes);
+    });
+  });
+
+  const elements: Element[] = await osmQuery;
+  const ways = elements.filter((element) => element.type === "way");
+  const waysAllExclusion = ways.filter(
+    (element) => element.tags.services[0].type === "exclusion"
+  );
+  const waysIntersect = waysAllExclusion.filter((way) =>
+    turf.intersect(newPoly, turf.polygon(way.tags.geometry.coordinates))
+  );
+
+  if (waysIntersect.length > 0) {
+    throw new Error("Exclusion intersection");
+  }
 
   let nodeIds: string[] = [];
 
