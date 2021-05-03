@@ -68,7 +68,8 @@ export const find = async (country: string, id: string): Promise<Ssr> => {
       geometry: p.tags.geometry,
       altitude: p.tags.altitude,
       provider: p.tags.provider,
-      timestamp: p.timestamp,
+      timestamp: new Date(p.timestamp).getTime() / 1000,
+      active: p.tags.active,
     }));
 
   const ssrs: Ssr[] = mapResponse(nodes);
@@ -104,7 +105,6 @@ export const remove = async (
       { changeset: nodes[0].changeset },
       function (err) {
         if (err) reject(err);
-        else resolve();
       }
     );
   });
@@ -142,8 +142,9 @@ export const findHex = async (
 
   const elements: Element[] = await osmQuery;
   const ways = elements.filter((element) => element.type === "way");
+  const waysActive = ways.filter((element) => element.tags.active === true);
 
-  const waysIntersect = ways.filter((way) =>
+  const waysIntersect = waysActive.filter((way) =>
     turf.intersect(hexPoly, turf.polygon(way.tags.geometry.coordinates))
   );
 
@@ -155,7 +156,8 @@ export const findHex = async (
       geometry: p.tags.geometry,
       altitude: p.tags.altitude,
       provider: p.tags.provider,
-      timestamp: p.timestamp,
+      timestamp: new Date(p.timestamp).getTime() / 1000,
+      active: p.tags.active,
     }));
 
   const ssrs: Ssr[] = mapResponse(waysIntersect);
@@ -193,7 +195,8 @@ export const findAllProvider = async (
       geometry: p.tags.geometry,
       altitude: p.tags.altitude,
       provider: p.tags.provider,
-      timestamp: p.timestamp,
+      timestamp: new Date(p.timestamp).getTime() / 1000,
+      active: p.tags.active,
     }));
 
   const ssrs: Ssr[] = mapResponse(waysAllProvider);
@@ -290,6 +293,7 @@ export const create = async (
       provider: provider,
       altitude: ssr.altitude,
       version: Global.ssdVersion,
+      active: ssr.active ?? true,
     },
   };
 
@@ -383,6 +387,7 @@ export const update = async (
       provider: provider,
       altitude: ssr.altitude,
       version: Global.ssdVersion,
+      active: ssr.active,
     },
   };
 

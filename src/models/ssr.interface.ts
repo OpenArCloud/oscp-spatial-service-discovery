@@ -1,12 +1,17 @@
 import turf from "@turf/turf";
 
+export interface Property {
+  type: string;
+  value: string;
+}
+
 export interface Service {
   id: string;
   type: string;
   title?: string;
   description?: string;
   url: URL;
-  capabilities?: string[];
+  properties?: Property[];
 }
 
 export interface Ssr {
@@ -16,5 +21,6 @@ export interface Ssr {
   geometry: turf.Polygon;
   altitude?: number;
   provider: string;
-  timestamp: Date;
+  timestamp: number;
+  active: boolean;
 }
