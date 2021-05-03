@@ -89,7 +89,7 @@ export interface Service {
   title?: string;
   description?: string;
   url: URL;
-  properties?: Property[]; //capabilities, includes supported topics for SCD
+  properties?: Property[]; 
 }
 
 export interface Ssr {
