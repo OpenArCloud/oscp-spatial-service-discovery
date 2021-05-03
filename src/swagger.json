@@ -331,10 +331,18 @@
               "url": {
                 "type": "string"
               },
-              "capabilities": {
+              "properties": {
                 "type": "array",
                 "items": {
-                  "type": "string"
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  }
                 }
               }
             }
@@ -350,7 +358,10 @@
           "type": "string"
         },
         "timestamp": {
-          "type": "string"
+          "type": "number"
+        },
+        "active": {
+          "type": "boolean"
         }
       }
     },
@@ -380,7 +391,7 @@
               "url": {
                 "type": "string"
               },
-              "capabilities": {
+              "properties": {
                 "type": "array",
                 "items": {
                   "type": "string"
@@ -394,7 +405,10 @@
         },
         "altitude": {
           "type": "number"
-        }
+        },
+        "active": {
+          "type": "boolean"
+        }      
       }
     }
   }

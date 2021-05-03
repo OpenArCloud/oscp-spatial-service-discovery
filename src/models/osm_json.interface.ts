@@ -7,6 +7,7 @@ export interface Tags {
   altitude?: number;
   provider: string;
   version: string;
+  active: boolean;
 }
 
 export interface Element {

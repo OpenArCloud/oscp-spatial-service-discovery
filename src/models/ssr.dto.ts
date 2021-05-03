@@ -2,6 +2,7 @@ import { Type } from "class-transformer";
 
 import {
   ArrayNotEmpty,
+  IsBoolean,
   IsDefined,
   IsLatitude,
   IsLongitude,
@@ -15,6 +16,14 @@ import {
 } from "class-validator";
 
 import turf from "@turf/turf";
+
+export class PropertyDto {
+  @IsString()
+  type: string;
+
+  @IsString()
+  value: string;
+}
 
 export class ServiceDto {
   @IsString()
@@ -36,7 +45,7 @@ export class ServiceDto {
 
   @IsString({ each: true })
   @IsOptional()
-  capabilities?: string[];
+  properties?: PropertyDto[];
 }
 
 export class SsrDto {
@@ -56,4 +65,8 @@ export class SsrDto {
   @IsNumber()
   @IsOptional()
   altitude?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  active?: boolean;
 }

@@ -14,7 +14,7 @@ Authentication/authorization is based on JSON Web Tokens (JWTs) via the [OpenID 
 ## Usage
 
 
-Tested on Node 12.18.3
+Tested on Node 14.6.1
 
 ```
 git clone https://github.com/OpenArCloud/oscp-spatial-service-discovery
@@ -78,13 +78,18 @@ application/vnd.oscp+json; version=1.0;
 Base version of a Spatial Service Record (expected to evolve):
 
 ```js
+export interface Property {
+  type: string;
+  value: string;
+}
+
 export interface Service {
   id: string; //provider supplied reference ID
   type: string; //type of spatial services provider ex. geopose, spatial-content
   title?: string;
   description?: string;
   url: URL;
-  capabilities?: string[]; //capabilities, includes supported topics for SCD
+  properties?: Property[]; //capabilities, includes supported topics for SCD
 }
 
 export interface Ssr {
@@ -94,7 +99,8 @@ export interface Ssr {
   geometry: turf.Polygon; //GeoJSON polygon
   altitude?: number;
   provider: string; //spatial services provider, populated by platform based on auth
-  timestamp: Date; //platform generated timestamp
+  timestamp: number; //platform generated timestamp
+  active: boolean; //state of SSR
 }
 ```
 
