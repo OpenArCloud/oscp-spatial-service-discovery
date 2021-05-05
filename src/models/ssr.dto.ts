@@ -33,8 +33,7 @@ export class ServiceDto {
   type: string;
 
   @IsString()
-  @IsOptional()
-  title?: string;
+  title: string;
 
   @IsString()
   @IsOptional()

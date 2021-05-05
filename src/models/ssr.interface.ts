@@ -8,7 +8,7 @@ export interface Property {
 export interface Service {
   id: string;
   type: string;
-  title?: string;
+  title: string;
   description?: string;
   url: URL;
   properties?: Property[];

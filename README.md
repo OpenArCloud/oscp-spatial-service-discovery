@@ -86,10 +86,10 @@ export interface Property {
 export interface Service {
   id: string; //provider supplied reference ID
   type: string; //type of spatial services provider ex. geopose, spatial-content
-  title?: string;
+  title: string;
   description?: string;
   url: URL;
-  properties?: Property[]; 
+  properties?: Property[]; //loosely specified service properties
 }
 
 export interface Ssr {
