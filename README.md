@@ -100,7 +100,7 @@ export interface Ssr {
   altitude?: number;
   provider: string; //spatial services provider, populated by platform based on auth
   timestamp: number; //platform generated timestamp
-  active: boolean; //state of SSR
+  active?: boolean; //state of SSR
 }
 ```
 
