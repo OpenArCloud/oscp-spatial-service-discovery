@@ -42,8 +42,10 @@ export class ServiceDto {
   @IsUrl()
   url: URL;
 
-  @IsString({ each: true })
+  @ValidateNested({ each: true })
   @IsOptional()
+  @ArrayNotEmpty()
+  @Type(() => PropertyDto)
   properties?: PropertyDto[];
 }
 
