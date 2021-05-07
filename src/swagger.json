@@ -302,6 +302,17 @@
         }
       ]
     },
+    "Property": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
     "Ssr": {
       "type": "object",
       "properties": {
@@ -336,12 +347,7 @@
                 "items": {
                   "type": "object",
                   "properties": {
-                    "type": {
-                      "type": "string"
-                    },
-                    "value": {
-                      "type": "string"
-                    }
+                    "$ref": "#/definitions/Property"
                   }
                 }
               }
@@ -394,7 +400,7 @@
               "properties": {
                 "type": "array",
                 "items": {
-                  "type": "string"
+                  "$ref": "#/definitions/Property"
                 }
               }
             }
