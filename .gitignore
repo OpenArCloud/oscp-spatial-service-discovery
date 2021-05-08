@@ -4,3 +4,7 @@ npm-debug.log
 .env
 .DS_Store
 dist/**/*
+
+# For VS Code development
+.vscode
+package-lock.json
