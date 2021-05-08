@@ -1,6 +1,6 @@
 # oscp-spatial-service-discovery
-OSCP Spatial Service Discovery
 
+OSCP Spatial Service Discovery
 
 ## Purpose
 
@@ -10,21 +10,19 @@ The P2P stack is based on components from the [Hypercore protocol](https://hyper
 
 Authentication/authorization is based on JSON Web Tokens (JWTs) via the [OpenID Connect](https://openid.net/connect/) standard. A sample integration with [Auth0](https://auth0.com/) is provided.
 
-
 ## Usage
-
 
 Tested on Node 14.6.1
 
-```
+```bash
 git clone https://github.com/OpenArCloud/oscp-spatial-service-discovery
 cd oscp-spatial-service-discovery
 npm install
 ```
 
-Create .env file with required params ex.
+Create a ".env" file in the project root folder with the required environment parameters. For example:
 
-```
+```text
 KAPPA_CORE_DIR="data"
 SWARM_TOPIC_PREFIX="oscpdev_ssd"
 AUTH0_ISSUER=https://ssd-oscp.us.auth0.com/
@@ -35,25 +33,23 @@ PORT=3000
 
 Start the Spatial Service Discovery service (development)
 
-```
+```bash
 npm run dev
 ```
 
 Start the Spatial Service Discovery service (production)
 
-```
+```bash
 npm start
 ```
 
 ## Testing via Swagger
 
-
-```
+```bash
 http://localhost:3000/swagger/
 ```
 
 ![Swagger image](images/swagger.png?raw=true)
-
 
 ## Search Logic
 
@@ -61,17 +57,15 @@ The query API expects a client to provide a hexagonal coverage area by using an 
 
 ![Search image](images/search.png?raw=true)
 
-
 ## API Versioning
 
 Current version: 1.0
 
 The API version can be specified by the HTTP Accept header using a vendor-specific media type as per [RFC4288](https://tools.ietf.org/html/rfc4288):
 
-```
+```bash
 application/vnd.oscp+json; version=1.0;
 ```
-
 
 ## Spatial Service Record (SSR)
 
@@ -104,7 +98,6 @@ export interface Ssr {
 }
 ```
 
-
 ## OSM Document
 
 Documents (OSM elements, observations, etc) have a common format within [kappa-osm](https://github.com/digidem/kappa-osm):
@@ -127,8 +120,6 @@ Documents (OSM elements, observations, etc) have a common format within [kappa-o
 
 GeoJSON polygons are mapped to OSM closed *ways* which reference an ordered set of OSM *nodes*. In addition, the GeoJSON polygons are stored as tags within the OSM *ways* to avoid the need to iterate through all nodes on reads. An OSM bounding box query returns a *way* if at least one of the corresponding *nodes* are covered.
 
-
 ## Configuring a Reference Auth Service
 
 To configure Auth0 as a reference auth service please see [Auth0 for SSD](auth0_ssd.md).
-
