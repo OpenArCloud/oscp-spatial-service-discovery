@@ -125,7 +125,7 @@ export const findHex = async (
   const hexCenterCoordinates = h3.h3ToGeo(h3Index);
 
   const center = [hexCenterCoordinates[1], hexCenterCoordinates[0]];
-  const radius = 5;
+  const radius = 100;
   const options = { steps: 6 };
   const circle = turf.circle(center, radius, options);
   const bbox = turf.bbox(circle);
