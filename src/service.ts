@@ -99,7 +99,7 @@ export const remove = async (
   if (nodes[0].tags.provider.toUpperCase() !== provider.toUpperCase())
     throw new Error("Invalid provider");
 
-  const osmDel = new Promise((resolve, reject) => {
+  const osmDel = new Promise<void>((resolve, reject) => {
     kappaCores[country].del(
       nodes[0].id,
       { changeset: nodes[0].changeset },
