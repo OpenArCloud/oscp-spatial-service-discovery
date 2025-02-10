@@ -15,7 +15,7 @@
 
 ## About The Project
 
-Update of [OSCP Spatial Service Discovery](https://github.com/OpenArCloud/oscp-spatial-service-discovery) to support prototype development in the [MSF Real/Virtual World Integration Working Group](https://github.com/MetaverseStandards/Virtual-Real-Integration). Adapted from [FastAPI-Tile38](https://github.com/iwpnd/fastapi-tile38).
+Update of [OSCP Spatial Service Discovery](https://github.com/OpenArCloud/oscp-spatial-service-discovery). Adapted from [FastAPI-Tile38](https://github.com/iwpnd/fastapi-tile38).
 
 
 <!-- GETTING STARTED -->
