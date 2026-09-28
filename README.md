@@ -25,12 +25,12 @@ npm install
 Create .env file as described below
 
 ```
-KAPPA_CORE_DIR="data"
-SWARM_TOPIC_PREFIX="oscpdev_ssd"
+KAPPA_CORE_DIR=data
+SWARM_TOPIC_PREFIX=oscpdev_ssd
 AUTH_REQUIRED=true
 AUTH0_ISSUER=https://ssd-oscp.us.auth0.com/
 AUTH0_AUDIENCE=https://ssd.oscp.cloudpose.io
-COUNTRIES="IT,FI,US"
+COUNTRIES=IT,FI,US
 PORT=8031
 SEARCH_RADIUS_KM=5
 ```
@@ -51,8 +51,55 @@ npm start
 
 ## Running the project via Docker
 
-Simply run the following command: `docker compose up -d`. This will build the image based on the present `Dockerfile` and set up the approppriate volumes for the project.
-If you have changed something in the source code and need to rebuild the image before running the service run the following command: `docker compose up --build --force-recreate --no-deps -d` this will rebuild the image and launch the service again. You might need to first stop the containers first with `docker compose down`. Note: Compose automatically reads a `.env` file in the same folder as `docker-compose.yaml` for variable substitution like `${PORT}`.
+Copy `.env.example` to `.env` and edit it first. The runtime image does not contain that file (the final stage only has `dist` and production dependencies). The process reads `process.env`, so the variables have to be injected when the container starts.
+
+Write values **without** surrounding quotes, as in `.env.example`. A quoted `COUNTRIES="IT,FI"` can keep the quote characters when Docker passes the file through, and the service would then reject the country list.
+
+`PORT` in `.env` is both the port Node listens on and the port to publish. `KAPPA_CORE_DIR` is a path relative to the project directory; the same relative path is mounted at `/app/<KAPPA_CORE_DIR>` inside the container. The entrypoint creates that directory and makes it writable.
+
+`APP_PORT` is only a build argument. It becomes the image's default `PORT` (and the `EXPOSE` value). A `PORT` value passed at run time overrides it. Use the same number in all three places.
+
+### docker compose
+
+From the project directory (the folder that contains `docker-compose.yaml` and `.env`):
+
+```
+docker compose up --build -d
+```
+
+That build is tagged `oscp/oscp-spatial-service-discovery:latest`.
+
+Compose reads `.env` twice:
+
+- It substitutes `${PORT}` and `${KAPPA_CORE_DIR}` in `docker-compose.yaml` (published port, `APP_PORT` build arg, and the data volume).
+- `env_file: .env` injects every variable from that file into the container, including `SWARM_TOPIC_PREFIX`, `COUNTRIES`, `AUTH_REQUIRED`, `AUTH0_ISSUER`, `AUTH0_AUDIENCE`, and `SEARCH_RADIUS_KM`.
+
+Rebuild after source or Dockerfile changes, then recreate the container so it picks up `.env` edits:
+
+```
+docker compose down
+docker compose up --build --force-recreate --no-deps -d
+```
+
+`docker compose down` stops the container and does not delete the host data directory.
+
+### docker run
+
+Build with the same port you will publish, then pass `.env` and mount the data directory. This example matches the defaults (`PORT=8031`, `KAPPA_CORE_DIR=data`):
+
+```
+docker build --build-arg APP_PORT=8031 -t oscp/oscp-spatial-service-discovery:latest .
+docker run -d --name oscp-spatial-service-discovery --env-file .env -p 8031:8031 -v "./data:/app/data" oscp/oscp-spatial-service-discovery:latest
+```
+
+`--env-file .env` is what supplies the runtime configuration. `-e NAME=value` overrides a single variable from that file. If `PORT` or `KAPPA_CORE_DIR` in `.env` is not the default, change `--build-arg`, `-p`, and `-v` to match. For `PORT=9000` and `KAPPA_CORE_DIR=data`:
+
+```
+docker build --build-arg APP_PORT=9000 -t oscp/oscp-spatial-service-discovery:latest .
+docker run -d --name oscp-spatial-service-discovery --env-file .env -p 9000:9000 -v "./data:/app/data" oscp/oscp-spatial-service-discovery:latest
+```
+
+Stop and remove the container with `docker rm -f oscp-spatial-service-discovery`. The host `data` directory remains.
 
 ### Environment Configuration
 
@@ -70,8 +117,8 @@ AUTH_REQUIRED=true
 AUTH0_ISSUER=https://<your_tenant>.auth0.com/
 AUTH0_AUDIENCE=https://<your_domain>:<your_port>
 
-# Spatial discovery regions (ISO country codes)
-COUNTRIES="AT,BE,BG,CY,CZ,DE,DK,EE,ES,FI,FR,GR,HR,HU,UI,IT,LT,LU,LV,MT,NL,PL,PT,RO,SE,SG,SI,SK,TR,US"
+# Spatial discovery regions (ISO country codes). No surrounding quotes.
+COUNTRIES=AT,BE,BG,CY,CZ,DE,DK,EE,ES,FI,FR,GR,HR,HU,UI,IT,LT,LU,LV,MT,NL,PL,PT,RO,SE,SG,SI,SK,TR,US
 
 # Service port (default: 8031). Docker publishes the same port on the host.
 PORT=8031
