@@ -130,7 +130,7 @@ export function assertGeoJsonPolygon(geometry: unknown): void {
   }
 
   const polygon = turf.polygon(rings);
-  turf.intersect(polygon, polygon);
+  turf.intersect(turf.featureCollection([polygon, polygon]));
 }
 
 @ValidatorConstraint({ name: "isGeoJsonPolygon", async: false })

@@ -1,9 +1,9 @@
-import turf from "@turf/turf";
+import { Polygon } from "geojson";
 import { Service } from "./ssr.interface";
 
 export interface Tags {
   services: Service[];
-  geometry: turf.Polygon;
+  geometry: Polygon;
   altitude?: number;
   provider: string;
   version: string;

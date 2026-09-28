@@ -96,6 +96,15 @@ function requireValidH3Index(h3Index: string): void {
   }
 }
 
+/** Turf 7 polygon() requires a closed ring. h3-js 3 does not repeat the first vertex. */
+function closedGeoJsonRing(boundary: number[][]): number[][] {
+  if (boundary.length === 0) return boundary;
+  const first = boundary[0];
+  const last = boundary[boundary.length - 1];
+  if (first[0] === last[0] && first[1] === last[1]) return boundary;
+  return [...boundary, [first[0], first[1]]];
+}
+
 /**
  * kappa-osm only knows OSM primitives (node / way / relation). An SSR is stored
  * as a closed OSM *way* (`type === "way"`) whose `refs` are vertex nodes; the
@@ -206,7 +215,7 @@ export const findHex = async (
   if (!COUNTRIES.includes(country)) throw new Error("Invalid country");
   requireValidH3Index(h3Index);
 
-  const hexBoundary = h3.h3ToGeoBoundary(h3Index, true);
+  const hexBoundary = closedGeoJsonRing(h3.h3ToGeoBoundary(h3Index, true));
   const hexPoly = turf.polygon([hexBoundary]);
   const hexCenterCoordinates = h3.h3ToGeo(h3Index);
 
@@ -234,7 +243,12 @@ export const findHex = async (
   const waysIntersect = waysActive.filter((way) => {
     try {
       return Boolean(
-        turf.intersect(hexPoly, turf.polygon(way.tags.geometry.coordinates))
+        turf.intersect(
+          turf.featureCollection([
+            hexPoly,
+            turf.polygon(way.tags.geometry.coordinates),
+          ])
+        )
       );
     } catch {
       return false;
