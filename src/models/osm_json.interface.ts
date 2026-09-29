@@ -1,9 +1,9 @@
-import turf from "@turf/turf";
+import { Polygon } from "geojson";
 import { Service } from "./ssr.interface";
 
 export interface Tags {
   services: Service[];
-  geometry: turf.Polygon;
+  geometry: Polygon;
   altitude?: number;
   provider: string;
   version: string;
@@ -13,6 +13,7 @@ export interface Tags {
 export interface Element {
   id?: string;
   deleted?: boolean;
+  // kappa-osm primitive: "node" (polygon vertex) or "way" (repurposed as an SSR).
   type: string;
   refs?: string[];
   changeset: string;

@@ -1,4 +1,4 @@
-import turf from "@turf/turf";
+import { Polygon } from "geojson";
 
 export interface Property {
   type: string;
@@ -18,7 +18,7 @@ export interface Ssr {
   id: string;
   type: string;
   services: Service[];
-  geometry: turf.Polygon;
+  geometry: Polygon;
   altitude?: number;
   provider: string;
   timestamp: number;

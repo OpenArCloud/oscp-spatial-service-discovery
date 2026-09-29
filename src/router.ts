@@ -15,6 +15,24 @@ const AUTH_REQUIRED: boolean = ["1", "true", "yes", "on"].includes(
 
 const NOAUTH_PROVIDER = "noauthtest";
 
+function httpStatusForError(message: string): number {
+  if (message && message.startsWith("Validation failed")) {
+    return 400;
+  }
+  switch (message) {
+    case "No record found":
+      return 404;
+    case "Invalid country":
+    case "Invalid h3Index":
+    case "Invalid polygon":
+      return 400;
+    case "Invalid provider":
+      return 403;
+    default:
+      return 500;
+  }
+}
+
 class Router {
   constructor(server: express.Express) {
     const router = express.Router();
@@ -33,6 +51,14 @@ class Router {
       return provider;
     };
 
+    router.get("/health", (_req: express.Request, res: express.Response) => {
+      res.status(200).json({ status: "ok" });
+    });
+
+    router.get("/countries", (_req: express.Request, res: express.Response) => {
+      res.status(200).json(Service.listCountries());
+    });
+
     router.get(
       "/:country/provider/ssrs",
       ...(AUTH_REQUIRED ? [checkJwt, jwtAuthz(["read:ssrs"])] : []),
@@ -46,7 +72,7 @@ class Router {
             .type("application/vnd.oscp+json; version=" + Global.ssdVersion)
             .send(ssrs);
         } catch (e: any) {
-          res.status(404).send(e.message);
+          res.status(httpStatusForError(e.message)).send(e.message);
         }
       }
     );
@@ -63,7 +89,7 @@ class Router {
             .type("application/vnd.oscp+json; version=" + Global.ssdVersion)
             .send(ssr);
         } catch (e: any) {
-          res.status(404).send(e.message);
+          res.status(httpStatusForError(e.message)).send(e.message);
         }
       }
     );
@@ -79,7 +105,7 @@ class Router {
           await Service.remove(country, id, provider);
           res.sendStatus(200);
         } catch (e: any) {
-          res.status(500).send(e.message);
+          res.status(httpStatusForError(e.message)).send(e.message);
         }
       }
     );
@@ -96,7 +122,7 @@ class Router {
             .type("application/vnd.oscp+json; version=" + Global.ssdVersion)
             .send(ssrs);
         } catch (e: any) {
-          res.status(404).send(e.message);
+          res.status(httpStatusForError(e.message)).send(e.message);
         }
       }
     );
@@ -112,7 +138,7 @@ class Router {
           const id: string = await Service.create(country, ssr, provider);
           res.status(201).send(id);
         } catch (e: any) {
-          res.status(404).send(e.message);
+          res.status(httpStatusForError(e.message)).send(e.message);
         }
       }
     );
@@ -129,7 +155,7 @@ class Router {
           await Service.update(country, id, ssr, provider);
           res.sendStatus(200);
         } catch (e: any) {
-          res.status(500).send(e.message);
+          res.status(httpStatusForError(e.message)).send(e.message);
         }
       }
     );

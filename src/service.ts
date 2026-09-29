@@ -1,8 +1,7 @@
 import { Ssr } from "./models/ssr.interface";
-import request from "request-promise";
 import { Element } from "./models/osm_json.interface";
 import { SsrDto } from "./models/ssr.dto";
-import { validateOrReject } from "class-validator";
+import { validateOrReject, ValidationError } from "class-validator";
 import "./noise-protocol-compat";
 import kappa from "kappa-core";
 import ram from "random-access-memory";
@@ -16,12 +15,106 @@ import { Global } from "./global";
 
 dotenv.config();
 
-const KAPPA_CORE_DIR: string = process.env.KAPPA_CORE_DIR as string;
-const SWARM_TOPIC_PREFIX: string = process.env.SWARM_TOPIC_PREFIX as string;
-let COUNTRIES: string[] = process.env.COUNTRIES.split(",");
-COUNTRIES = COUNTRIES.map(function (x) {
-  return x.toUpperCase();
-});
+function requireEnv(name: string): string {
+  const value = process.env[name];
+  if (value === undefined || value.trim() === "") {
+    throw new Error(
+      `Missing required environment variable: ${name}. Set it in .env or the process environment.`
+    );
+  }
+  return value;
+}
+
+function optionalEnvNumber(name: string, defaultValue: number): number {
+  const raw = process.env[name];
+  if (raw === undefined || raw.trim() === "") {
+    return defaultValue;
+  }
+  const value = Number(raw);
+  if (!Number.isFinite(value) || value <= 0) {
+    throw new Error(
+      `Invalid environment variable: ${name}. Must be a positive number.`
+    );
+  }
+  return value;
+}
+
+const KAPPA_CORE_DIR: string = requireEnv("KAPPA_CORE_DIR");
+const SWARM_TOPIC_PREFIX: string = requireEnv("SWARM_TOPIC_PREFIX");
+const SEARCH_RADIUS_KM: number = optionalEnvNumber("SEARCH_RADIUS_KM", 5);
+const COUNTRIES: string[] = requireEnv("COUNTRIES")
+  .split(",")
+  .map((country) => country.trim().toUpperCase())
+  .filter((country) => country.length > 0);
+
+export function listCountries(): string[] {
+  return [...COUNTRIES];
+}
+
+function flattenValidationErrors(
+  errors: ValidationError[],
+  parent = ""
+): string[] {
+  const messages: string[] = [];
+  for (const error of errors) {
+    const property = parent ? `${parent}.${error.property}` : error.property;
+    if (error.constraints) {
+      for (const msg of Object.values(error.constraints)) {
+        messages.push(`${property}: ${msg}`);
+      }
+    }
+    if (error.children && error.children.length > 0) {
+      messages.push(...flattenValidationErrors(error.children, property));
+    }
+  }
+  return messages;
+}
+
+async function assertValid(value: object): Promise<void> {
+  try {
+    await validateOrReject(value);
+  } catch (errors) {
+    if (Array.isArray(errors)) {
+      const details = flattenValidationErrors(errors as ValidationError[]);
+      throw new Error(
+        details.length > 0
+          ? `Validation failed: ${details.join("; ")}`
+          : "Validation failed"
+      );
+    }
+    throw errors;
+  }
+}
+
+function sameIgnoreCase(a: string | undefined, b: string): boolean {
+  return typeof a === "string" && a.toUpperCase() === b.toUpperCase();
+}
+
+function requireValidH3Index(h3Index: string): void {
+  if (!h3Index || !h3.h3IsValid(h3Index)) {
+    throw new Error("Invalid h3Index");
+  }
+}
+
+/** Turf 7 polygon() requires a closed ring. h3-js 3 does not repeat the first vertex. */
+function closedGeoJsonRing(boundary: number[][]): number[][] {
+  if (boundary.length === 0) return boundary;
+  const first = boundary[0];
+  const last = boundary[boundary.length - 1];
+  if (first[0] === last[0] && first[1] === last[1]) return boundary;
+  return [...boundary, [first[0], first[1]]];
+}
+
+/**
+ * kappa-osm only knows OSM primitives (node / way / relation). An SSR is stored
+ * as a closed OSM *way* (`type === "way"`) whose `refs` are vertex nodes; the
+ * SSR payload lives in the way's tags. Those ways are not OpenStreetMap streets.
+ * Do not change the on-disk type: existing databases and bbox queries depend on
+ * it. HTTP responses map these records to `type: "ssr"`.
+ */
+function isLiveSsr(element: Element): boolean {
+  return element.type === "way" && !element.deleted;
+}
 
 export interface IHash {
   [key: string]: any;
@@ -97,7 +190,7 @@ export const remove = async (
 
   if (nodes.length === 0) throw new Error("No record found");
   if (nodes[0].deleted) throw new Error("No record found");
-  if (nodes[0].tags.provider.toUpperCase() !== provider.toUpperCase())
+  if (!sameIgnoreCase(nodes[0].tags.provider, provider))
     throw new Error("Invalid provider");
 
   const osmDel = new Promise<void>((resolve, reject) => {
@@ -120,16 +213,17 @@ export const findHex = async (
   h3Index: string
 ): Promise<Ssr[]> => {
   if (!COUNTRIES.includes(country)) throw new Error("Invalid country");
-  if (!h3Index) throw new Error("Invalid h3Index");
+  requireValidH3Index(h3Index);
 
-  const hexBoundary = h3.h3ToGeoBoundary(h3Index, true);
+  const hexBoundary = closedGeoJsonRing(h3.h3ToGeoBoundary(h3Index, true));
   const hexPoly = turf.polygon([hexBoundary]);
   const hexCenterCoordinates = h3.h3ToGeo(h3Index);
 
   const center = [hexCenterCoordinates[1], hexCenterCoordinates[0]];
-  const radius = 100;
-  const options = { steps: 6 };
-  const circle = turf.circle(center, radius, options);
+  const circle = turf.circle(center, SEARCH_RADIUS_KM, {
+    steps: 6,
+    units: "kilometers",
+  });
   const bbox = turf.bbox(circle);
 
   const osmQuery = new Promise<Element[]>((resolve, reject) => {
@@ -143,12 +237,23 @@ export const findHex = async (
   });
 
   const elements: Element[] = await osmQuery;
-  const ways = elements.filter((element) => element.type === "way");
+  const ways = elements.filter(isLiveSsr);
   const waysActive = ways.filter((element) => element.tags.active === true);
 
-  const waysIntersect = waysActive.filter((way) =>
-    turf.intersect(hexPoly, turf.polygon(way.tags.geometry.coordinates))
-  );
+  const waysIntersect = waysActive.filter((way) => {
+    try {
+      return Boolean(
+        turf.intersect(
+          turf.featureCollection([
+            hexPoly,
+            turf.polygon(way.tags.geometry.coordinates),
+          ])
+        )
+      );
+    } catch {
+      return false;
+    }
+  });
 
   const mapResponse = (response: Element[]) =>
     response.map((p) => ({
@@ -183,10 +288,10 @@ export const findAllProvider = async (
 
   const elements: Element[] = await osmQuery;
 
-  const ways = elements.filter((element) => element.type === "way");
+  const ways = elements.filter(isLiveSsr);
 
   const waysAllProvider = ways.filter(
-    (element) => element.tags.provider === provider
+    (element) => sameIgnoreCase(element.tags.provider, provider)
   );
 
   const mapResponse = (response: Element[]) =>
@@ -215,22 +320,11 @@ export const create = async (
 
   if (!provider) throw new Error("Invalid provider");
 
-  try {
-    await validateOrReject(ssr);
-  } catch (errors) {
-    throw new Error("Validation failed");
-  }
-
-  if (
-    JSON.stringify(ssr.geometry.coordinates[0][0]) !==
-    JSON.stringify(
-      ssr.geometry.coordinates[0][ssr.geometry.coordinates[0].length - 1]
-    )
-  )
-    throw new Error("Invalid polygon");
+  await assertValid(ssr);
 
   let nodeIds: string[] = [];
 
+  // Vertex nodes so kappa-osm can bbox-index the closed way. They are not SSRs.
   for (let i = 0; i < ssr.geometry.coordinates[0].length - 1; i++) {
     const node: Element = {
       type: "node",
@@ -256,6 +350,7 @@ export const create = async (
   }
 
   const way: Element = {
+    // Repurposed OSM way: this is the SSR. Keep type "way" for existing records.
     type: "way",
     changeset: "abcdef",
     refs: nodeIds,
@@ -295,11 +390,7 @@ export const update = async (
 
   if (!provider) throw new Error("Invalid provider");
 
-  try {
-    await validateOrReject(ssr);
-  } catch (errors) {
-    throw new Error("Validation failed");
-  }
+  await assertValid(ssr);
 
   const osmGet = new Promise<Element[]>((resolve, reject) => {
     kappaCores[country].get(id, function (err, nodes) {
@@ -312,19 +403,12 @@ export const update = async (
 
   if (nodes.length === 0) throw new Error("No record found");
   if (nodes[0].deleted) throw new Error("No record found");
-  if (nodes[0].tags.provider.toUpperCase() !== provider.toUpperCase())
+  if (!sameIgnoreCase(nodes[0].tags.provider, provider))
     throw new Error("Invalid provider");
-
-  if (
-    JSON.stringify(ssr.geometry.coordinates[0][0]) !==
-    JSON.stringify(
-      ssr.geometry.coordinates[0][ssr.geometry.coordinates[0].length - 1]
-    )
-  )
-    throw new Error("Invalid polygon");
 
   let nodeIds: string[] = [];
 
+  // Vertex nodes so kappa-osm can bbox-index the closed way. They are not SSRs.
   for (let i = 0; i < ssr.geometry.coordinates[0].length - 1; i++) {
     const node: Element = {
       type: "node",
@@ -350,6 +434,7 @@ export const update = async (
   }
 
   const way: Element = {
+    // Repurposed OSM way: this is the SSR. Keep type "way" for existing records.
     type: "way",
     changeset: "abcdef",
     refs: nodeIds,
@@ -359,7 +444,7 @@ export const update = async (
       provider: provider,
       altitude: ssr.altitude,
       version: Global.ssdVersion,
-      active: ssr.active,
+      active: ssr.active ?? nodes[0].tags.active ?? true,
     },
   };
 
